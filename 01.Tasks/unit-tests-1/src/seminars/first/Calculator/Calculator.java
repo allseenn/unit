@@ -1,12 +1,6 @@
-package hw.first.Calculator;
-import static org.assertj.core.api.Assertions.*;
+package seminars.first.Calculator;
 
 public class Calculator {
-
-    public static void main(String[]args){
-
-            System.out.println("Hello, World!");
-    }
     public static int calculation(int firstOperand, int secondOperand, char operator) {
         int result;
 
@@ -40,10 +34,10 @@ public class Calculator {
         //  Отрицательные числа
         //  Дробные значения корней
         //  Целые
-        if(num < 0) {
-            throw new IllegalArgumentException("Cannot calculate square root of a negative number");
-        }
-        return Math.sqrt(num);
+            if(num < 0) {
+                throw new IllegalArgumentException("Cannot calculate square root of a negative number");
+            }
+            return Math.sqrt(num);
     }
 
     // Нужно написать в калькуляторе метод вычисления суммы покупки со скидкой и проверить его, используя AssertJ
@@ -51,10 +45,6 @@ public class Calculator {
     public static double calculatingDiscount(double purchaseAmount, int discountAmount) {
         // purchaseAmount - сумма покупки
         // discountAmount - размер скидки
-        double total = purchaseAmount - purchaseAmount * discountAmount / 100;
-        if (total < 0) {throw new ArithmeticException("Отрицательная сумма покупки не может быть");}
-        if (discountAmount < 0) {throw new ArithmeticException("Процент не может быть отрицательным");}
-        if (purchaseAmount <= 0) {throw new ArithmeticException("Цена должна быть больше нуля");}
-        return total; // Метод должен возвращать сумму покупки со скидкой
+        return 0; // Метод должен возвращать сумму покупки со скидкой
     }
 }
