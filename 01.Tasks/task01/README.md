@@ -1,18 +1,17 @@
-## Getting Started
+# Unit-тесты (семинары)
+## Урок 1. Цели и смысл тестирования
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+### Условия к ДЗ
 
-## Folder Structure
+- Задание 1. ** В классе Calculator создайте метод calculateDiscount, который принимает сумму покупки и процент скидки и возвращает сумму с учетом скидки. Ваша задача - проверить этот метод с использованием библиотеки AssertJ. Если метод calculateDiscount получает недопустимые аргументы, он должен выбрасывать исключение ArithmeticException. Не забудьте написать тесты для проверки этого поведения.
 
-The workspace contains two folders by default, where:
+- *Задание 2. (необязательное) *
+Мы хотим улучшить функциональность нашего интернет-магазина. Ваша задача - добавить два новых метода в класс Shop:
+Метод sortProductsByPrice(), который сортирует список продуктов по стоимости. Метод getMostExpensiveProduct(), который возвращает самый дорогой продукт. Напишите тесты, чтобы проверить, что магазин хранит верный список продуктов (правильное количество продуктов, верное содержимое корзины).
+Напишите тесты для проверки корректности работы метода getMostExpensiveProduct. Напишите тесты для проверки корректности работы метода sortProductsByPrice (проверьте правильность сортировки). Используйте класс Product для создания экземпляров продуктов и класс Shop для написания методов сортировки и тестов.
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+### Решение
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+- [Задание 1](https://github.com/allseenn/unit/blob/main/01.Tasks/task01/src/CalculatorTest.java)
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+- [Задание 2](https://github.com/allseenn/unit/blob/main/01.Tasks/task01/src/ShopTest.java)
