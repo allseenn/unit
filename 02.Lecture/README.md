@@ -104,12 +104,12 @@ JUnit породил экосистему расширений — jMock, EasyMo
 
 ## Фреймворки для тестирования Java
 
-<table width="680" cellpadding="4" cellspacing="0" style="page-break-inside: auto">
+<table>
  <tr>
-  <td width="134">Name</td>
-  <td width="64"><a href="https://en.wikipedia.org/wiki/XUnit">xUnit</a>
-  </td>
-  <td width="456">Remarks</td>
+  <th>Name</th>
+  <th><a href="https://en.wikipedia.org/wiki/XUnit">xUnit</a>
+  </th>
+  <th>Remarks</th>
  </tr>
  <tr>
   <td>Agitar</td>
