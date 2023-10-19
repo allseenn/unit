@@ -601,3 +601,401 @@ JUnit породил экосистему расширений — jMock, EasyMo
      </td>
  </tr>
 </table>
+
+## JUnit 5
+
+JUnit 5 можно разделить на 3 различных проекта: 
+
+1. JUnit Platform
+2. Jupiter
+3. Vintage
+
+<img src=pics/junit.png>
+
+- **JUnit Platform**, разработчик не взаимодействует напрямую с ядром фреймворка, для этого предоставлено API (Jupiter).
+- **Vintage** — ещё один API, но для старых версий JUnit, он обеспечивает обратную совместимость со старыми версиями, т. е. можно безболезненно перейти со старой версии и не обязательно будет переписывать старые тесты, они могут
+работать все одновременно в одном проекте.
+- **Third party** - Можно писать своё API , которое будет обращаться к тестовому движку.
+- **Build tools** (Maven, gradle) — это системы сборки проектов, которые берут на себя настройку зависимостей, скачивание библиотек, автоматизацию процессов тестирования.
+
+### JUnit 5 Asserts (устарел)
+
+junit.framework.Assert
+- assertEquals
+- assertFalse
+- assertNotNull
+- assertNull
+- assertNotSame
+- assertSame
+- assertTrue
+
+Синтаксис JUnit Assert похож на AssertJ:
+```
+public class MathTest {
+    @Test
+    public void testEquals() {
+        Assert.assertEquals(4, 2 + 2);
+        Assert.assertTrue(4 == 2 + 2);
+    }
+    @Test
+    public void testNotEquals() {
+        Assert.assertFalse(5 == 2 + 2);
+    }
+}
+```
+
+### Установка JUnit 5
+
+1. [junit-jupiter-api](https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api/5.9.1)
+2. [junit-platform-commons](https://mvnrepository.com/artifact/org.junit.platform/junit-platform-commons/1.9.1)
+3. import org.junit.jupiter.api.*;
+
+### Тестовый и рабочий код
+
+Прежде чем приступить к написанию тестов, нужно настроить корневой каталог для тестов. Корневой каталог Test Sources — это папка, в которой хранится ваш тестовый код. В окне Project tool эта папка отмечена зеленым значком. В этих папках код, относящийся к тестированию, хранится отдельно от рабочего кода.
+
+Настроить тестовую папку можно следующим образом:
+
+1. Создадим директорию Test.
+2. Разметим её, как каталог для тестов, для этого перейдём в настройки проекта (IDEA: File → Project Structure — вкладка Sources) и отметим папку Test как Tests, папка должна стать зелёной.
+3. Перенесём старый тестовый класс CalculationTest в новую Test Sources.
+
+Перепишем тестовый класс, с использованием JUnit 5:
+
+```
+import org.junit.jupiter.api.Test;
+import ru.gb.units.Calculator;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+public class CalculationTest {
+    @Test
+    void additionExpressionEvaluation() {
+        Calculator calculator = new Calculator();
+        assertThat(calculator.calculation(2,6,'+')).isEqualTo(8);
+    }
+    @Test
+    void subtractionExpressionEvaluation () {
+        Calculator calculator = new Calculator();
+        assertThat(calculator.calculation(2,2,'-')).isEqualTo(0);
+    }
+    @Test
+    void multiplicationExpressionEvaluation () {
+        Calculator calculator = new Calculator();
+        assertThat(calculator.calculation(2,7,'*')).isEqualTo(14);
+    }
+    @Test
+    void divisionExpressionEvaluation () {
+        Calculator calculator = new Calculator();
+        assertThat(calculator.calculation(100,90,'/')).isEqualTo(2);
+    }
+    @Test
+    void expectedIllegalStateExceptionOnInvalidOperatorSymbol () {
+        Calculator calculator = new Calculator();
+        assertThatThrownBy(() ->
+        calculator.calculation(8,4,'_'))
+        .isInstanceOf(IllegalStateException.class);
+    }
+}
+```
+
+### @Test
+Аннотация (декоратор) @Test в JUnit 5 используется для указания того, что аннотированный метод является методом тестирования. Находится аннотация в пакете junit.jupiter.api. 
+
+Вот ее исходный код:
+
+```
+package org.junit.jupiter.api;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import org.apiguardian.api.API;
+import org.apiguardian.api.API.Status;
+import org.junit.platform.commons.annotation.Testable;
+
+@Target({ElementType.ANNOTATION_TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+@API(
+    status = Status.STABLE,
+    since = "5.0"
+)
+@Testable
+public @interface Test {
+}
+```
+
+### Допишем класс Calculator
+
+В main вызов методов getOperator() и getOperand(), с их помощью мы будем
+запрашивать и получать от пользователя значения для вычисления.
+
+```
+package ru.geekbrains;
+import java.util.Scanner;
+
+public class Calculator {
+    private static final Scanner scanner = new Scanner(System.in);
+        public static void main(String[] args) {
+        int firstOperand = getOperand();
+        int secondOperand = getOperand();
+        char operator = getOperator();
+        int result = calculation(firstOperand, secondOperand, operator);
+        System.out.println("Результат операции: " + result);
+    }
+    public static int calculation(int firstOperand, int secondOperand, char operator) { 
+        int result;
+        switch (operator) {
+            case '+':
+                result = firstOperand + secondOperand;
+                break;
+            case '-':
+                result = firstOperand - secondOperand;
+                break;
+            case '*':
+                result = firstOperand * secondOperand;
+                break;
+            case '/':
+                if (secondOperand != 0) {
+                    result = firstOperand / secondOperand;
+                    break;
+                } else {
+                    throw new ArithmeticException("Division by zero");
+                }
+            default:
+                throw new IllegalStateException("Unexpected Operator");
+        }
+        return result;
+    }
+    public static char getOperator() {
+        System.out.println("Введите операцию:");
+        char operation = scanner.next().charAt(0);
+        return operation;
+    }
+    public static int getOperand() {
+        System.out.println("Введите число:");
+        int operand = scanner.nextInt();
+        return operand;
+    }
+}
+```
+
+### Тестируем новые функции
+
+В случае, когда в метод getOperand() передаётся не цифра возникает ошибка IllegalStateException: Unexpected Operator.
+
+Исправим этот метод:
+
+```
+package ru.geekbrains;
+import java.util.Scanner;
+
+public class Calculator {
+    private static final Scanner scanner = new Scanner(System.in);
+        public static void main(String[] args) {
+        int firstOperand = getOperand();
+        int secondOperand = getOperand();
+        char operator = getOperator();
+        int result = calculation(firstOperand, secondOperand, operator);
+        System.out.println("Результат операции: " + result);
+    }
+    public static int calculation(int firstOperand, int secondOperand, char operator) { 
+        int result;
+        switch (operator) {
+            case '+':
+                result = firstOperand + secondOperand;
+                break;
+            case '-':
+                result = firstOperand - secondOperand;
+                break;
+            case '*':
+                result = firstOperand * secondOperand;
+                break;
+            case '/':
+                if (secondOperand != 0) {
+                    result = firstOperand / secondOperand;
+                    break;
+                } else {
+                    throw new ArithmeticException("Division by zero");
+                }
+            default:
+                throw new IllegalStateException("Unexpected Operator");
+        }
+        return result;
+    }
+    public static char getOperator() {
+        System.out.println("Введите операцию:");
+        char operation = scanner.next().charAt(0);
+        return operation;
+    }
+    public static int getOperand() {
+        System.out.println("Введите число:");
+        int operand;
+        if (scanner.hasNextInt()) {
+            operand = scanner.nextInt();
+        } else {
+            System.out.println("Вы допустили ошибку при вводе числа. Попробуйте еще раз");
+        if (scanner.hasNext()) {
+            scanner.next();
+            operand = getOperand();
+        } else {
+            throw new IllegalStateException("Ошибка в вводимых данных");
+            }
+        }
+        return operand;
+    }
+}
+```
+
+И напишем соответствующие тесты:
+1. Для случая, когда в метод передаётся корректное значение:
+- getOperandCompletesCorrectlyWithNumbers
+
+В этом случаем мы ожидаем завершение без ошибок.
+
+2. Для случая, когда в метод передается некорректное значение:
+- getOperandCompletesCorrectlyWithNotNumbers
+
+В этом случаем мы хотим увидеть ожидаемое исключение.
+
+Метод getOperand работает со сканером, и должен корректно принимать цифры. Для теста мы должны имитировать ввод пользователем значений. Это делается с помощью System.setIn(...):
+
+```
+import org.assertj.core.api.Assert;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import ru.gb.units.Calculator;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.util.Scanner;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+public class CalculationTest {
+...
+@Test
+void getOperandCompletesCorrectlyWithNumbers() {
+String testedValue = "9"; // Значение для тестов
+ByteArrayInputStream in = new
+ByteArrayInputStream(testedValue.getBytes());
+InputStream inputStream = System.in; // Сохраняем ссылку
+на ввод с клавиатуры
+System.setIn(in); // Подменяем ввод
+Calculator.getOperand(); // Вызываем метод
+System.out.println(testedValue); // Для наглядности
+вывода
+System.setIn(inputStream); // Подменяем обратно
+}
+}
+@Test
+void getOperandCompletesCorrectlyWithNotNumbers() {
+String testedValue = "k";
+ByteArrayInputStream in = new
+ByteArrayInputStream(testedValue.getBytes());
+ByteArrayOutputStream out = new ByteArrayOutputStream();
+InputStream inputStream = System.in;
+System.setIn(in);
+System.setOut(new PrintStream(out));
+assertThatThrownBy(() -> Calculator.getOperand())
+.isInstanceOf(IllegalStateException.class).describedAs("Ошибка
+в вводимых данных");
+System.setIn(inputStream);
+System.setOut(null);
+}
+```
+
+## Аннотации
+Рассмотрим некоторые важные аннотации в JUnit 5 Jupiter API. Большинство из
+них находятся в пакете org.junit.jupiter.api в модуле junit-jupiter-api.
+### @BeforeEach
+Означает, что аннотированный метод должен выполняться перед каждым
+методом @Test, @RepeatedTest, @ParameterizedTest или @TestFactory в текущем
+классе.
+
+```
+@BeforeEach
+public void initEach(){
+//test setup code
+}
+```
+
+### @AfterEach
+Означает, что аннотированный метод должен выполняться после каждого метода
+@Test, @RepeatedTest, @ParameterizedTest или @TestFactory в текущем классе.
+
+```
+@AfterEach
+public void cleanUpEach(){
+//Test cleanup code
+}
+```
+
+### @BeforeAll
+Означает, что аннотированный метод должен выполняться перед всеми методами @Test, @RepeatedTest, @ParameterizedTest и @TestFactory в текущем классе; аналогично @BeforeClass в JUnit 4. Такие методы должны быть статическими, если не используется жизненный цикл тестового экземпляра «для каждого класса».
+
+```
+@BeforeAll
+public static void init(){
+System.out.println("BeforeAll init() method called");
+}
+```
+
+### @AfterAll
+Означает, что аннотированный метод должен выполняться после всех методов
+@Test, @RepeatedTest, @ParameterizedTest и @TestFactory в текущем классе.
+Такие методы должны быть статическими, если не используется жизненный цикл
+экземпляра теста «для каждого класса».
+
+```
+@AfterAll
+public static void cleanUp(){
+System.out.println("After All cleanUp() method called");
+}
+```
+
+### @DisplayName
+Объявляет пользовательское отображаемое имя для тестового класса или
+тестового метода.
+
+```
+@Test
+@DisplayName("╯°□°)╯")
+void testWithDisplayNameContainingSpecialCharacters() {
+}
+```
+
+### @Disable
+Используется для отключения тестового класса или тестового метода;
+
+```
+@Disabled("Disabled until bug #42 has been resolved")
+@Test
+void testWillBeSkipped() {
+}
+```
+
+### @RepeatedTest
+Означает, что метод является шаблоном теста для повторного тестирования.
+
+```
+@RepeatedTest(10)
+void repeatedTest() {
+// ...
+}
+```
+
+### @ParameterizedTest
+Означает, что метод является параметризованным тестом.
+
+```
+@ParameterizedTest
+@ValueSource(strings = { "racecar", "radar", "able was I ere I
+saw elba" })
+void palindromes(String candidate) {
+assertTrue(StringUtils.isPalindrome(candidate));
+}
+```
